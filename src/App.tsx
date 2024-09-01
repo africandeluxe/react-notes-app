@@ -1,13 +1,9 @@
 import React from 'react';
 import NoteApp from './components/NoteApp';
-import '../src/styles/App.scss';
+import './styles/main.scss';
 
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <NoteApp />
-    </div>
-  );
+  return <NoteApp />;
 };
 
 export default App;
