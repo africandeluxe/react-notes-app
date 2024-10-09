@@ -1,47 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import styles from './NoteApp.module.scss';
-import { Note } from '../../types/Note';
-import { loadNotes, saveNotes } from '../../services/localStorageService';
+import React, { useState } from 'react';
+import noteAppStyles from './NoteApp.module.scss';
+import NoteItem from '../NoteItem';
+interface Note {
+  id: string;
+  text: string;
+}
 
 const NoteApp: React.FC = () => {
-  const [notes, setNotes] = useState<Note[]>(loadNotes());
-  const [input, setInput] = useState<string>('');
-
-  useEffect(() => {
-    saveNotes(notes);
-  }, [notes]);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [newNote, setNewNote] = useState<string>('');
 
   const addNote = () => {
-    if (input.trim()) {
-      setNotes([...notes, { id: Date.now().toString(), text: input }]);
-      setInput('');
-    }
+    if (newNote.trim() === '') return;
+    const note: Note = {
+      id: Date.now().toString(),
+      text: newNote,
+    };
+    setNotes([...notes, note]);
+    setNewNote('');
   };
 
-  const removeNote = (id: string) => {
+  const deleteNote = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
   };
 
   return (
-    <div className={styles.container}>
-      <h1>Notes</h1>
-      <div className={styles['input-container']}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter a note"
-        />
-        <button onClick={addNote}>Add Note</button>
+    <div className="container">
+      <div className="note-section">
+        <div className={noteAppStyles['input-container']}>
+          <input type="text" value={newNote} placeholder="Add a new note" onChange={(e) => setNewNote(e.target.value)} />
+          <button onClick={addNote} className={noteAppStyles['note-button']}>Add Note</button>
+        </div>
+
+        <ul className={noteAppStyles['note-list']}>
+          {notes.map((note) => (
+            <NoteItem key={note.id} id={note.id} text={note.text} onDelete={deleteNote} />
+          ))}
+        </ul>
       </div>
-      <ul className={styles['note-list']}>
-        {notes.map(note => (
-          <li key={note.id} className={styles['note-item']}>
-            {note.text}
-            <button onClick={() => removeNote(note.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
